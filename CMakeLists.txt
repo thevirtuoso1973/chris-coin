@@ -8,6 +8,7 @@ set(CHRIS_COIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set( CHRIS_COIN_SOURCES
   src/main.cpp
   src/web/web.cpp
+  src/core/blockchain.cpp
   )
 
 find_package(Boost 1.47 COMPONENTS thread system REQUIRED)

@@ -1,18 +1,22 @@
 #pragma once
 
 #include <vector>
-#include "../core/block.hpp"
+#include <mutex>
 #include "crow_all.h"
 
+#include "../core/block.hpp"
+#include "../core/blockchain.hpp"
+
 class FullNode {
-    private:
-      std::vector<Block> blockchain;
-      crow::SimpleApp app;
+  private:
+    Blockchain blockchain;
+    std::mutex blockchainLock;
+    crow::SimpleApp app;
 
-    public:
-        FullNode();
+  public:
+    FullNode();
 
-        void run(int portNum);
+    void run(int portNum);
 
-        virtual ~FullNode();
+    virtual ~FullNode();
 };
