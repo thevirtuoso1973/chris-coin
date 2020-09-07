@@ -11,7 +11,9 @@ class FullNode {
   private:
     Blockchain blockchain;
     std::mutex blockchainLock;
+
     crow::SimpleApp app;
+    std::vector<std::string> peerIPs;
 
   public:
     FullNode();
