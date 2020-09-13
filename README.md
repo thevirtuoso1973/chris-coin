@@ -1,10 +1,11 @@
 # Disclaimer
 
-This is a WIP, attempting to use this client on the bitcoin mainnet is highly inadvisable.
+This is a WIP, attempting to connect this node to the bitcoin mainnet is highly inadvisable.
 
 # ChrisCoin
 
-This is an attempt to implement an SPV client for Bitcoin using (mostly) Satoshi's [original paper](https://bitcoincore.org/bitcoin.pdf).
+This is an attempt to implement an SPV node for Bitcoin using Satoshi's [original paper](https://bitcoincore.org/bitcoin.pdf) and the
+protocol documentation from the [wiki](https://en.bitcoin.it/wiki/Protocol_documentation#Block_Headers).
 
 # Project Goals
 
