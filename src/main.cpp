@@ -1,7 +1,7 @@
-#include "web/web.hpp"
+#include "web/node.hpp"
 
 int main() {
     FullNode fullNode;
 
-    fullNode.run(8081);
+    fullNode.run(6666);
 }

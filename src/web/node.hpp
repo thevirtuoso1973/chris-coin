@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <mutex>
-#include "crow_all.h"
 
 #include "../core/block.hpp"
 #include "../core/blockchain.hpp"
@@ -12,8 +11,7 @@ class FullNode {
     Blockchain blockchain;
     std::mutex blockchainLock;
 
-    crow::SimpleApp app;
-    std::vector<std::string> peerIPs;
+    std::vector<std::string> peerSockets;
 
   public:
     FullNode();
