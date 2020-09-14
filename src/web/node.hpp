@@ -3,6 +3,7 @@
 #include <vector>
 #include <mutex>
 
+#include "peers.hpp"
 #include "../core/block.hpp"
 #include "../core/blockchain.hpp"
 
@@ -11,7 +12,7 @@ class FullNode {
     Blockchain blockchain;
     std::mutex blockchainLock;
 
-    std::vector<std::string> peerSockets;
+    std::vector<Peer> peers; // not necessarily open/closed
 
   public:
     FullNode();

@@ -8,11 +8,11 @@
 
 FullNode::FullNode() {
     PeerFinder peerFinder;
-    peerSockets = peerFinder.getPeerSockets();
+    peers = peerFinder.getPeers();
 }
 
 void FullNode::run(int portNum) {
-    if (peerSockets.size() == 0) {
+    if (peers.size() == 0) {
         std::cerr << "Not enough peers." << std::endl;
     }
 }
