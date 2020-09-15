@@ -15,15 +15,22 @@ Peer::Peer(std::string ip, int port) {
     this->port = port;
 }
 
+// creates TCP handle and sets listeners
 void Peer::init(std::shared_ptr<uvw::Loop> loop) {
     auto tcp = loop->resource<uvw::TCPHandle>();
     if (tcp) {
         tcp->on<uvw::ErrorEvent>([](const uvw::ErrorEvent& event, uvw::TCPHandle& tcp) {
-            // TODO: handle errors
+            event.what();
+            tcp.close();
         });
         tcp->once<uvw::ConnectEvent>([](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) {
             // TODO: connect to the peer, send version message etc.
         });
+        tcp->on<uvw::DataEvent>([this](const uvw::DataEvent& event, uvw::TCPHandle& tcp) {
+            std::clog << this << ' ' << event.data.get() << std::endl;
+            // TODO
+        });
+
         tcp->connect(ip, port);
     } else {
         std::cerr << "TCP handle failed to init." << std::endl;
