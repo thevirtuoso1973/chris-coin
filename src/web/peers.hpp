@@ -1,5 +1,7 @@
 #pragma once
 
+#include "messages.hpp"
+
 #include <uvw.hpp>
 
 #include <memory>
@@ -11,6 +13,8 @@ class Peer {
     private:
         std::string ip;
         int port;
+
+        MessageBuilder messageBuilder;
 
     public:
         Peer(std::string ip, int port);

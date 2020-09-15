@@ -1,5 +1,6 @@
 #include <bits/stdint-intn.h>
 #include <bits/stdint-uintn.h>
+#include <string>
 #include <sys/types.h>
 
 enum Magic { MAIN, TESTNET, TESTNET3, NAMECOIN };
@@ -23,17 +24,25 @@ class MessageBuilder {
         );
 
     public:
+        MessageBuilder();
+
         // Gets the entire message (not just the payload)
         char* getVersionMessage(
             int32_t version,
             uint64_t services,
             int64_t timestamp,
-            net_addr addr_recv
-            // Fields below require version >= 106
-            // TODO
+            net_addr addr_recv,
+            // Fields below require version >= 106:
+            net_addr addr_from,
+            uint64_t nonce,
+            std::string user_agent_string,
+            int32_t start_height,
+            // requires version >= 70001:
+            bool relay
         );
 
-        MessageBuilder();
+        char* getVerackMessage();
+
         ~MessageBuilder();
 };
 
