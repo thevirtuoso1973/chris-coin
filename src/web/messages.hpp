@@ -23,10 +23,9 @@ class MessageBuilder {
         char* createMessage(
             Magic magic,
             char* command,
-            uint32_t length,
+            uint32_t payload_length,
             uint32_t checksum,
-            unsigned char* payload,
-            int payload_length
+            unsigned char* payload
         );
 
     public:

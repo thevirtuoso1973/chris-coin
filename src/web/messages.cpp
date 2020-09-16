@@ -1,5 +1,7 @@
 #include "messages.hpp"
 
+#include <openssl/evp.h>
+
 // assumes there's enough space
 void writeLittleEndian(unsigned long bigEndian, char* toWriteInto) {
     while (bigEndian > 0) {
@@ -27,17 +29,46 @@ void writeMagic(Magic magic, char* toWriteInto) {
     }
 }
 
+unsigned char* getDoubleHashed(const unsigned char* data, uint32_t length) {
+    auto mdctx = EVP_MD_CTX_new();
+    auto md = EVP_sha256();
+    unsigned char* md_value = new unsigned char[EVP_MAX_MD_SIZE];
+    unsigned int md_len;
+
+    // first hash:
+    EVP_DigestInit_ex(mdctx, md, nullptr);
+    EVP_DigestUpdate(mdctx, data, length);
+    EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+    // second hash:
+    EVP_DigestInit_ex(mdctx, md, nullptr);
+    EVP_DigestUpdate(mdctx, md_value, md_len);
+    EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+
+    EVP_MD_CTX_free(mdctx);
+
+    return md_value;
+}
+
 char* MessageBuilder::createMessage(
     Magic magic,
     char* command,
-    uint32_t length,
+    uint32_t payload_length,
     uint32_t checksum,
-    unsigned char* payload,
-    int payload_length
+    unsigned char* payload
 ) {
     char* data = new char[4+12+4+4+payload_length];
-    writeMagic(magic, data);
-    // TODO
+    writeMagic(magic, data); // pointer 0
+    for (int write = 4, s = 0; write < 4 + 12; write++, s++) { // 4
+      data[write] = command[s];
+    }
+    writeLittleEndian(payload_length, &data[16]); // 16
+    auto digest = getDoubleHashed(payload, payload_length); // 20
+    for (int write = 20, i = 0; write < 20 + 4; write++, i++) {
+        data[write] = digest[i];
+    }
+    for (int write = 24, i = 0; write < 24 + payload_length; write++, i++) { // 24
+        data[write] = payload[i];
+    }
     return data;
 }
 
