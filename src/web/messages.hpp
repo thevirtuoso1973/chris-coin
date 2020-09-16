@@ -19,12 +19,11 @@ struct net_addr {
 
 class MessageBuilder {
     private:
-        // helper function that wraps the header around the payload
+        // Helper function that wraps the header around the payload. Will generate the checksum.
         char* createMessage(
             Magic magic,
             char* command,
             uint32_t payload_length,
-            uint32_t checksum,
             unsigned char* payload
         );
 

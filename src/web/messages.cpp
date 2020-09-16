@@ -1,5 +1,6 @@
 #include "messages.hpp"
 
+#include <bits/stdint-uintn.h>
 #include <openssl/evp.h>
 
 // assumes there's enough space
@@ -53,7 +54,6 @@ char* MessageBuilder::createMessage(
     Magic magic,
     char* command,
     uint32_t payload_length,
-    uint32_t checksum,
     unsigned char* payload
 ) {
     char* data = new char[4+12+4+4+payload_length];
@@ -85,8 +85,11 @@ char* MessageBuilder::getVersionMessage(
     int32_t start_height,
     bool relay
 ) {
+    char *command = (char*) "version";
+    uint32_t payload_length = 4+8+8+26+26+8+user_agent_string.size()+4+1;
+    unsigned char *payload = new unsigned char[payload_length];
     // TODO
-    return 0;
+    return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
 
 char* MessageBuilder::getVerackMessage() {
