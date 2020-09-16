@@ -12,11 +12,6 @@
 #include <vector>
 #include <stdexcept>
 
-#define VERSION 70015
-#define SERVICES 0
-#define HEIGHT 0
-#define RELAY false
-
 Peer::Peer(std::string ip, int port) {
     this->messageBuilder = MessageBuilder();
     this->ip = ip;
@@ -32,6 +27,7 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
             tcp.close();
         });
         tcp->once<uvw::ConnectEvent>([this](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) {
+            std::clog << "Connecting to " << this << std::endl;
             int64_t tStamp = std::time(nullptr);
             net_addr addr_recv = net_addr {0, SERVICES, &this->ip[0], static_cast<uint16_t>(this->port)};
             char localIp[] = "127.0.0.1";

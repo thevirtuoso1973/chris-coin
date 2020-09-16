@@ -17,6 +17,7 @@ set(CHRIS_COIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set( CHRIS_COIN_SOURCES
   src/main.cpp
+  src/web/messages.cpp
   src/web/node.cpp
   src/web/peers.cpp
   src/core/blockchain.cpp

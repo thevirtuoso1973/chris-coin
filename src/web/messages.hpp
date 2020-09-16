@@ -3,6 +3,11 @@
 #include <string>
 #include <sys/types.h>
 
+const static int32_t VERSION = 70015;
+const static uint64_t SERVICES = 0;
+const static int32_t HEIGHT = 0;
+const static bool RELAY = false;
+
 enum Magic { MAIN, TESTNET, TESTNET3, NAMECOIN };
 
 struct net_addr {
@@ -20,7 +25,8 @@ class MessageBuilder {
             char* command,
             uint32_t length,
             uint32_t checksum,
-            unsigned char* payload
+            unsigned char* payload,
+            int payload_length
         );
 
     public:
