@@ -82,6 +82,10 @@ char* MessageBuilder::createMessage(
 
 MessageBuilder::MessageBuilder() {}
 
+void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
+    // TODO
+}
+
 char* MessageBuilder::getVersionMessage(
     int32_t version,
     uint64_t services,
@@ -99,12 +103,18 @@ char* MessageBuilder::getVersionMessage(
     writeLittleEndian(version, payload);
     writeLittleEndian(services, payload+4);
     writeLittleEndian(timestamp, payload+12);
+    // addr_recv:
+    writeLittleEndian(addr_recv.services, payload+20);
+    writeIPAddr(addr_recv.ipAddr, addr_recv.isIPv6, payload+28);
+    // TODO: write port in network byte order
+    // addr_from:
+    // TODO
     return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
 
 char* MessageBuilder::getVerackMessage() {
-    // TODO
-    return 0;
+    char *command = (char*) "verack";
+    return createMessage(Magic::TESTNET3, command, 0, nullptr);
 }
 
 MessageBuilder::~MessageBuilder() {}

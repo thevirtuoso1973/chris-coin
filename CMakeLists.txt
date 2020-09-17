@@ -29,3 +29,5 @@ include_directories(
 
 add_executable(${PROJECT_NAME} ${CHRIS_COIN_SOURCES})
 target_link_libraries(${PROJECT_NAME} uv)
+target_link_libraries(${PROJECT_NAME} ssl)
+target_link_libraries(${PROJECT_NAME} crypto)

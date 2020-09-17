@@ -12,9 +12,10 @@
 #include <vector>
 #include <stdexcept>
 
-Peer::Peer(std::string ip, int port) {
+Peer::Peer(std::string ip, bool isIPv6, int port) {
     this->messageBuilder = MessageBuilder();
     this->ip = ip;
+    this->isIPv6 = isIPv6;
     this->port = port;
 }
 
@@ -29,9 +30,21 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
         tcp->once<uvw::ConnectEvent>([this](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) {
             std::clog << "Connecting to " << this << std::endl;
             int64_t tStamp = std::time(nullptr);
-            net_addr addr_recv = net_addr {0, SERVICES, &this->ip[0], static_cast<uint16_t>(this->port)};
+            net_addr addr_recv = net_addr {
+                0,
+                SERVICES,
+                &(this->ip[0]),
+                static_cast<uint16_t>(this->port),
+                this->isIPv6
+            };
             char localIp[] = "127.0.0.1";
-            net_addr addr_from = net_addr {0, SERVICES, localIp, 18333};
+            net_addr addr_from = net_addr {
+                0,
+                SERVICES,
+                localIp,
+                18333,
+                this->isIPv6
+            };
             std::string userAgent = ""; // NOTE: empty user agent string
             auto dataWrite = this->messageBuilder.getVersionMessage(
                 VERSION,
@@ -75,9 +88,10 @@ Peer PeerFinder::parsePeerString(const std::string& line) { // NOTE: no error ha
     if (delim == std::string::npos) {
         throw std::invalid_argument("PeerFinder: input doesn't have a ':' delimiter");
     }
-    std::string newIP = (line[0] == '[') ? line.substr(1,delim-2) : line.substr(0,delim);
+    bool isIPv6 = line[0] == '[';
+    std::string newIP = (isIPv6) ? line.substr(1,delim-2) : line.substr(0,delim);
     int newPort = std::stoi(line.substr(delim+1));
-    return Peer(newIP, newPort);
+    return Peer(newIP, isIPv6, newPort);
 }
 
 std::vector<Peer> PeerFinder::getPeers() {

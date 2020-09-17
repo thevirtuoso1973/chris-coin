@@ -12,12 +12,13 @@
 class Peer {
     private:
         std::string ip;
+        bool isIPv6;
         int port;
 
         MessageBuilder messageBuilder;
 
     public:
-        Peer(std::string ip, int port);
+        Peer(std::string ip, bool isIPv6, int port);
 
         void init(std::shared_ptr<uvw::Loop> loop);
 

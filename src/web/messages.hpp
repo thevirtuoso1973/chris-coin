@@ -15,6 +15,7 @@ struct net_addr {
     uint64_t services;
     char* ipAddr;
     uint16_t port;
+    bool isIPv6;
 };
 
 class MessageBuilder {
