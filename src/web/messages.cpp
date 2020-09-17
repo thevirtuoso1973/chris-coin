@@ -3,10 +3,12 @@
 #include <bits/stdint-uintn.h>
 #include <openssl/evp.h>
 
-// assumes there's enough space
-void writeLittleEndian(unsigned long bigEndian, char* toWriteInto) {
-    while (bigEndian > 0) {
-        unsigned long newValue = bigEndian & 0xFF;
+// assumes there's enough space, sizeof(T) should be the number of bytes to write
+template<typename T>
+void writeLittleEndian(T bigEndian, char* toWriteInto) {
+    int numBytes = sizeof(T);
+    while (numBytes-- > 0) {
+        uint8_t newValue = bigEndian & 0xFF;
         *(toWriteInto++) = newValue;
 
         bigEndian = bigEndian >> 8;
@@ -14,23 +16,29 @@ void writeLittleEndian(unsigned long bigEndian, char* toWriteInto) {
 }
 
 void writeMagic(Magic magic, char* toWriteInto) {
+    // declaring these explicitly since we need the 'uint32_t' type
+    const uint32_t main = 0xD9B4BEF9;
+    const uint32_t testnet = 0xDAB5BFFA;
+    const uint32_t testnet3 = 0x0709110B;
+    const uint32_t namecoin = 0xFEB4BEF9;
+
     switch (magic) {
         case MAIN:
-            writeLittleEndian(0xD9B4BEF9, toWriteInto);
+            writeLittleEndian(main, toWriteInto);
             break;
         case TESTNET:
-            writeLittleEndian(0xDAB5BFFA, toWriteInto);
+            writeLittleEndian(testnet, toWriteInto);
             break;
         case TESTNET3:
-            writeLittleEndian(0x0709110B, toWriteInto);
+            writeLittleEndian(testnet3, toWriteInto);
             break;
         case NAMECOIN:
-            writeLittleEndian(0xFEB4BEF9, toWriteInto);
+            writeLittleEndian(namecoin, toWriteInto);
             break;
     }
 }
 
-unsigned char* getDoubleHashed(const unsigned char* data, uint32_t length) {
+unsigned char* getDoubleHashed(const char* data, uint32_t length) {
     auto mdctx = EVP_MD_CTX_new();
     auto md = EVP_sha256();
     unsigned char* md_value = new unsigned char[EVP_MAX_MD_SIZE];
@@ -54,7 +62,7 @@ char* MessageBuilder::createMessage(
     Magic magic,
     char* command,
     uint32_t payload_length,
-    unsigned char* payload
+    char* payload
 ) {
     char* data = new char[4+12+4+4+payload_length];
     writeMagic(magic, data); // pointer 0
@@ -87,8 +95,10 @@ char* MessageBuilder::getVersionMessage(
 ) {
     char *command = (char*) "version";
     uint32_t payload_length = 4+8+8+26+26+8+user_agent_string.size()+4+1;
-    unsigned char *payload = new unsigned char[payload_length];
-    // TODO
+    char *payload = new char[payload_length];
+    writeLittleEndian(version, payload);
+    writeLittleEndian(services, payload+4);
+    writeLittleEndian(timestamp, payload+12);
     return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
 

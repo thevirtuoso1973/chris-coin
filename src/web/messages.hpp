@@ -24,7 +24,7 @@ class MessageBuilder {
             Magic magic,
             char* command,
             uint32_t payload_length,
-            unsigned char* payload
+            char* payload
         );
 
     public:
