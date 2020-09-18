@@ -2,6 +2,8 @@
 
 #include <bits/stdint-uintn.h>
 #include <openssl/evp.h>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <cassert>
 
@@ -94,12 +96,44 @@ char* MessageBuilder::createMessage(
 
 MessageBuilder::MessageBuilder() {}
 
-std::vector<uint8_t> getIPv6Bytes(const char* ipAddr) {
-    // TODO
+std::vector<std::string> split(std::string s, char delim) {
+    std::vector<std::string> out;
+    int currStart = 0;
+    int delimPos;
+    while (currStart < s.size() && (delimPos = s.find(delim, currStart)) != std::string::npos) {
+        out.push_back((currStart <= delimPos-currStart) ? s.substr(currStart, delimPos-currStart) : "");
+        currStart = delimPos+1;
+    }
+    if (currStart < s.size()) {
+        out.push_back(s.substr(currStart));
+    }
+    return out;
 }
 
-std::vector<uint8_t> getIPv4Bytes(const char* ipAddr) {
-    // TODO
+std::vector<uint8_t> getIPv6Bytes(const std::string ipAddr) {
+    std::vector<uint8_t> out;
+    std::vector<std::string> hexStrings = split(ipAddr, ':');
+    for (auto s : hexStrings) {
+        uint8_t temp;
+        std::stringstream ss;
+
+        ss << std::hex << s.substr(0,2);
+        ss >> temp;
+        out.push_back(temp);
+        ss << std::hex << s.substr(2);
+        ss >> temp;
+        out.push_back(temp);
+    }
+    return out;
+}
+
+std::vector<uint8_t> getIPv4Bytes(const std::string ipAddr) {
+    std::vector<uint8_t> out;
+    std::vector<std::string> bytestrings = split(ipAddr, '.');
+    for (auto s : bytestrings) {
+        out.push_back(std::stoi(s));
+    }
+    return out;
 }
 
 void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
