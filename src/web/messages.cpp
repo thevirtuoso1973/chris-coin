@@ -2,6 +2,8 @@
 
 #include <bits/stdint-uintn.h>
 #include <openssl/evp.h>
+#include <vector>
+#include <cassert>
 
 // assumes there's enough space, sizeof(T) should be the number of bytes to write
 template<typename T>
@@ -12,6 +14,16 @@ void writeLittleEndian(T bigEndian, char* toWriteInto) {
         *(toWriteInto++) = newValue;
 
         bigEndian = bigEndian >> 8;
+    }
+}
+
+// assumes there's enough space, sizeof(T) should be the number of bytes to write
+template<typename T>
+void writeBigEndian(T bigEndian, char* toWriteInto) {
+    int numBytes = sizeof(T);
+    for (int i = 0; i < numBytes; i++) {
+        uint8_t newValue = (bigEndian >> 8*(numBytes-i-1)) & 0xFF;
+        *(toWriteInto++) = newValue;
     }
 }
 
@@ -82,8 +94,31 @@ char* MessageBuilder::createMessage(
 
 MessageBuilder::MessageBuilder() {}
 
-void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
+std::vector<uint8_t> getIPv6Bytes(const char* ipAddr) {
     // TODO
+}
+
+std::vector<uint8_t> getIPv4Bytes(const char* ipAddr) {
+    // TODO
+}
+
+void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
+    if (isIPv6) {
+        auto bytes = getIPv6Bytes(ipAddr);
+        assert(bytes.size() == 16 && "Expecting 16 bytes for IPv6");
+        for (int i = 0; i < 16; i++) {
+            *(toWrite++) = bytes[0];
+        }
+    } else {
+        // 10 empty bytes followed by FF FF and then the 4 bytes of IP
+        for (int i = 0; i < 10; i++) {
+            *(toWrite++) = 0x00;
+        }
+        *(toWrite++) = 0xFF;
+        *(toWrite++) = 0xFF;
+        auto bytes = getIPv4Bytes(ipAddr);
+        assert(bytes.size() == 4 && "Expecting 4 bytes for IPv4");
+    }
 }
 
 char* MessageBuilder::getVersionMessage(
@@ -106,8 +141,11 @@ char* MessageBuilder::getVersionMessage(
     // addr_recv:
     writeLittleEndian(addr_recv.services, payload+20);
     writeIPAddr(addr_recv.ipAddr, addr_recv.isIPv6, payload+28);
-    // TODO: write port in network byte order
+    writeBigEndian(addr_recv.port, payload+44); // network byte order is big endian
     // addr_from:
+    writeLittleEndian(addr_from.services, payload+46);
+    writeIPAddr(addr_from.ipAddr, addr_recv.isIPv6, payload+54);
+    writeBigEndian(addr_from.port, payload+70);
     // TODO
     return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
