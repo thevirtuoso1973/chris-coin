@@ -81,7 +81,7 @@ char* MessageBuilder::createMessage(
     char* data = new char[4+12+4+4+payload_length];
     writeMagic(magic, data); // pointer 0
     for (int write = 4, s = 0; write < 4 + 12; write++, s++) { // 4
-      data[write] = command[s];
+        data[write] = command[s];
     }
     writeLittleEndian(payload_length, &data[16]); // 16
     auto digest = getDoubleHashed(payload, payload_length); // 20
@@ -155,13 +155,24 @@ void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
     }
 }
 
-void writeString(std::string s, char* toWrite) {
+// writes var_int and then the char array.
+void writeVarString(std::string s, char *toWrite) {
     // TODO
 }
 
+// gets number of bytes including the var_int
 int getVarStrSize(std::string s) {
-    // TODO
-    return 0;
+    int intLen;
+    if (s.size() < 0xFD) {
+        intLen = 1;
+    } else if (s.size() <= 0xFFFF) {
+        intLen = 3;
+    } else if (s.size() <= 0xFFFFFFFF) {
+        intLen = 5;
+    } else {
+        intLen = 9;
+    }
+    return intLen+s.size();
 }
 
 char* MessageBuilder::getVersionMessage(
@@ -194,7 +205,7 @@ char* MessageBuilder::getVersionMessage(
 
     writeLittleEndian(nonce, payload+72);
     if (user_agent_string.length() > 0) {
-        writeString(user_agent_string, payload+80);
+        writeVarString(user_agent_string, payload + 80);
     } else {
         char* temp = payload+80;
         *temp = 0x00;
