@@ -155,6 +155,15 @@ void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
     }
 }
 
+void writeString(std::string s, char* toWrite) {
+    // TODO
+}
+
+int getVarStrSize(std::string s) {
+    // TODO
+    return 0;
+}
+
 char* MessageBuilder::getVersionMessage(
     int32_t version,
     uint64_t services,
@@ -167,11 +176,13 @@ char* MessageBuilder::getVersionMessage(
     bool relay
 ) {
     char *command = (char*) "version";
-    uint32_t payload_length = 4+8+8+26+26+8+user_agent_string.size()+4+1;
+    int varStrLen = getVarStrSize(user_agent_string);
+    uint32_t payload_length = 4+8+8+26+26+8+varStrLen+4+1;
     char *payload = new char[payload_length];
     writeLittleEndian(version, payload);
     writeLittleEndian(services, payload+4);
     writeLittleEndian(timestamp, payload+12);
+
     // addr_recv:
     writeLittleEndian(addr_recv.services, payload+20);
     writeIPAddr(addr_recv.ipAddr, addr_recv.isIPv6, payload+28);
@@ -180,7 +191,16 @@ char* MessageBuilder::getVersionMessage(
     writeLittleEndian(addr_from.services, payload+46);
     writeIPAddr(addr_from.ipAddr, addr_recv.isIPv6, payload+54);
     writeBigEndian(addr_from.port, payload+70);
-    // TODO
+
+    writeLittleEndian(nonce, payload+72);
+    if (user_agent_string.length() > 0) {
+        writeString(user_agent_string, payload+80);
+    } else {
+        char* temp = payload+80;
+        *temp = 0x00;
+    }
+    writeLittleEndian(start_height, payload+80+varStrLen);
+    // TODO write a boolean, (somehow)
     return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
 
