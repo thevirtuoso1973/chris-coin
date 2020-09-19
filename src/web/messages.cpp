@@ -101,7 +101,7 @@ std::vector<std::string> split(std::string s, char delim) {
     int currStart = 0;
     int delimPos;
     while (currStart < s.size() && (delimPos = s.find(delim, currStart)) != std::string::npos) {
-        out.push_back((currStart <= delimPos-currStart) ? s.substr(currStart, delimPos-currStart) : "");
+        out.push_back((currStart < delimPos) ? s.substr(currStart, delimPos-currStart) : "");
         currStart = delimPos+1;
     }
     if (currStart < s.size()) {
@@ -110,7 +110,7 @@ std::vector<std::string> split(std::string s, char delim) {
     return out;
 }
 
-std::vector<uint8_t> getIPv6Bytes(const std::string ipAddr) {
+std::vector<uint8_t> getIPv6Bytes(const std::string ipAddr) { // FIXME: doesn't support all IPv6 formats
     std::vector<uint8_t> out;
     std::vector<std::string> hexStrings = split(ipAddr, ':');
     for (auto s : hexStrings) {
