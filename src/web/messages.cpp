@@ -157,7 +157,30 @@ void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
 
 // writes var_int and then the char array.
 void writeVarString(std::string s, char *toWrite) {
-    // TODO
+    int sLength = s.size();
+    if (sLength < 0xFD) {
+        uint8_t len = sLength;
+        *(toWrite++) = len;
+    } else if (sLength <= 0xFFFF) {
+        uint16_t len = sLength;
+        *(toWrite++) = 0xFD;
+        writeLittleEndian(len, toWrite);
+        toWrite += 2;
+    } else if (sLength <= 0xFFFFFFFF) {
+        uint32_t len = sLength;
+        *(toWrite++) = 0xFE;
+        writeLittleEndian(len, toWrite);
+        toWrite += 4;
+    } else {
+        uint64_t len = sLength;
+        *(toWrite++) = 0xFF;
+        writeLittleEndian(len, toWrite);
+        toWrite += 8;
+    }
+    // write the actual string:
+    for (int i = 0; i < sLength; i++) {
+        *(toWrite++) = s[0];
+    }
 }
 
 // gets number of bytes including the var_int
@@ -211,7 +234,8 @@ char* MessageBuilder::getVersionMessage(
         *temp = 0x00;
     }
     writeLittleEndian(start_height, payload+80+varStrLen);
-    // TODO write a boolean, (somehow)
+    uint8_t relayBool = (relay) ? 0x01 : 0x00; // NOTE: not sure if 0x01 is true
+    writeBigEndian(relayBool, payload+80+varStrLen+4);
     return createMessage(Magic::TESTNET3, command, payload_length, payload);
 }
 
