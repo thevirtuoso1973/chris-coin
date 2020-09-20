@@ -60,4 +60,4 @@ macro(package_add_test TESTNAME) # from https://cliutils.gitlab.io/modern-cmake/
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-#package_add_test(test1 test1.cpp)
+package_add_test(test_messages tests/test_messages.cpp)
