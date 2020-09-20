@@ -11,12 +11,24 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <iomanip>
 
 Peer::Peer(std::string ip, bool isIPv6, int port) {
     this->messageBuilder = MessageBuilder();
     this->ip = ip;
     this->isIPv6 = isIPv6;
     this->port = port;
+}
+
+void printHex(const char* toPrint, int size, int width = 16) {
+    for (int i = 0; i < size; i++) {
+        if (i % width == 0) {
+            std::cout << std::endl;
+        }
+        //std::cout << std::hex << std::setfill('0') << std::setw(2) << toPrint[i] << ' ';
+        std::cout << (int)toPrint[i] << ' ';
+    }
+    std::cout << std::endl << std::dec;
 }
 
 // creates TCP handle and sets listeners
@@ -46,6 +58,9 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
                 this->isIPv6
             };
             std::string userAgent = ""; // NOTE: empty user agent string
+            const int dataLength = 4+12+4+4
+                +4+8+8+26+26+8+this->messageBuilder.getVarStrSize(userAgent)+4+1; // payload
+               
             auto dataWrite = this->messageBuilder.getVersionMessage(
                 VERSION,
                 SERVICES,
@@ -57,10 +72,11 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
                 HEIGHT,
                 false
             );
-            tcp.write(
-                std::move(dataWrite),
-                4+8+8+26+26+8+userAgent.size()+1+4+1 // number of bytes
-            );
+            printHex(dataWrite, dataLength);
+            // tcp.write(
+            //     std::move(dataWrite),
+            //     4+8+8+26+26+8+userAgent.size()+1+4+1 // number of bytes
+            // );
         });
         tcp->on<uvw::DataEvent>([this](const uvw::DataEvent& event, uvw::TCPHandle& tcp) {
             std::clog << this << ' ' << event.data.get() << std::endl;

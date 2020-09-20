@@ -183,8 +183,7 @@ void writeVarString(std::string s, char *toWrite) {
     }
 }
 
-// gets number of bytes including the var_int
-int getVarStrSize(std::string s) {
+int MessageBuilder::getVarStrSize(std::string s) {
     int intLen;
     if (s.size() < 0xFD) {
         intLen = 1;

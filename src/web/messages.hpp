@@ -45,8 +45,10 @@ class MessageBuilder {
             // requires version >= 70001:
             bool relay
         );
-
         char* getVerackMessage();
+
+        // gets number of bytes including the var_int
+        int getVarStrSize(std::string s);
 
         ~MessageBuilder();
 };
