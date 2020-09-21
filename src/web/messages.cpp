@@ -9,7 +9,7 @@
 
 // assumes there's enough space, sizeof(T) should be the number of bytes to write
 template<typename T>
-void writeLittleEndian(T bigEndian, char* toWriteInto) {
+void MessageBuilder::writeLittleEndian(T bigEndian, char* toWriteInto) {
     int numBytes = sizeof(T);
     while (numBytes-- > 0) {
         uint8_t newValue = bigEndian & 0xFF;
@@ -21,7 +21,7 @@ void writeLittleEndian(T bigEndian, char* toWriteInto) {
 
 // assumes there's enough space, sizeof(T) should be the number of bytes to write
 template<typename T>
-void writeBigEndian(T bigEndian, char* toWriteInto) {
+void MessageBuilder::writeBigEndian(T bigEndian, char* toWriteInto) {
     int numBytes = sizeof(T);
     for (int i = 0; i < numBytes; i++) {
         uint8_t newValue = (bigEndian >> 8*(numBytes-i-1)) & 0xFF;
@@ -29,7 +29,7 @@ void writeBigEndian(T bigEndian, char* toWriteInto) {
     }
 }
 
-void writeMagic(Magic magic, char* toWriteInto) {
+void MessageBuilder::writeMagic(Magic magic, char* toWriteInto) {
     // declaring these explicitly since we need the 'uint32_t' type
     const uint32_t main = 0xD9B4BEF9;
     const uint32_t testnet = 0xDAB5BFFA;
@@ -74,7 +74,7 @@ unsigned char* getDoubleHashed(const char* data, uint32_t length) {
 
 char* MessageBuilder::createMessage(
     Magic magic,
-    char* command,
+    const char* command,
     uint32_t payload_length,
     char* payload
 ) {
@@ -136,7 +136,7 @@ std::vector<uint8_t> getIPv4Bytes(const std::string ipAddr) {
     return out;
 }
 
-void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
+void MessageBuilder::writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
     if (isIPv6) {
         auto bytes = getIPv6Bytes(ipAddr);
         assert(bytes.size() == 16 && "Expecting 16 bytes for IPv6");
@@ -156,7 +156,7 @@ void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
 }
 
 // writes var_int and then the char array.
-void writeVarString(std::string s, char *toWrite) {
+void MessageBuilder::writeVarString(std::string s, char *toWrite) {
     int sLength = s.size();
     if (sLength < 0xFD) {
         uint8_t len = sLength;
@@ -208,7 +208,7 @@ char* MessageBuilder::getVersionMessage(
     int32_t start_height,
     bool relay
 ) {
-    char *command = (char*) "version";
+    const char *command = "version\0\0\0\0";
     int varStrLen = getVarStrSize(user_agent_string);
     uint32_t payload_length = 4+8+8+26+26+8+varStrLen+4+1;
     char *payload = new char[payload_length];
@@ -239,7 +239,7 @@ char* MessageBuilder::getVersionMessage(
 }
 
 char* MessageBuilder::getVerackMessage() {
-    char *command = (char*) "verack";
+    const char *command = "verack\0\0\0\0\0";
     return createMessage(Magic::TESTNET3, command, 0, nullptr);
 }
 

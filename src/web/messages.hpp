@@ -20,10 +20,19 @@ struct net_addr {
 
 class MessageBuilder {
     private:
+        template<typename T>
+        void writeLittleEndian(T bigEndian, char* toWriteInto);
+        template<typename T>
+        void writeBigEndian(T bigEndian, char* toWriteInto);
+
+        void writeMagic(Magic magic, char* toWriteInto);
+        void writeVarString(std::string s, char *toWrite);
+        void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite);
+
         // Helper function that wraps the header around the payload. Will generate the checksum.
         char* createMessage(
             Magic magic,
-            char* command,
+            const char* command,
             uint32_t payload_length,
             char* payload
         );

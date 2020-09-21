@@ -35,7 +35,6 @@ add_executable(${PROJECT_NAME} ${CHRIS_COIN_SOURCES})
 target_link_libraries(${PROJECT_NAME} uv)
 target_link_libraries(${PROJECT_NAME} ssl)
 target_link_libraries(${PROJECT_NAME} crypto)
-#target_link_libraries(${PROJECT_NAME} gtest_main)
 
 # tests:
 option(PACKAGE_TESTS "Build the tests" ON)
@@ -49,7 +48,7 @@ macro(package_add_test TESTNAME) # from https://cliutils.gitlab.io/modern-cmake/
     add_executable(${TESTNAME} ${ARGN})
     # link the Google test infrastructure, mocking library, and a default main fuction to
     # the test executable.  Remove g_test_main if writing your own main function.
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main)
+    target_link_libraries(${TESTNAME} gtest gmock gtest_main uv ssl crypto)
     # gtest_discover_tests replaces gtest_add_tests,
     # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
     gtest_discover_tests(${TESTNAME}
@@ -60,4 +59,4 @@ macro(package_add_test TESTNAME) # from https://cliutils.gitlab.io/modern-cmake/
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(test_messages tests/test_messages.cpp)
+package_add_test(test_messages tests/test_messages.cpp src/web/messages.cpp)
