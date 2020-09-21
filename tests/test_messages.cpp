@@ -16,7 +16,7 @@ TEST_F(MessageBuilderTest, getVarStrSizeWorks) {
 
 TEST_F(MessageBuilderTest, getVerackMessageWorks) {
     char expected[] {
-        static_cast<char>(0xF9), static_cast<char>(0xBE), static_cast<char>(0xB4), static_cast<char>(0xD9),
+        static_cast<char>(0x0B), static_cast<char>(0x11), static_cast<char>(0x09), static_cast<char>(0x07),
             'v', 'e', 'r', 'a', 'c', 'k', '\0', '\0', '\0', '\0', '\0',
             0x00, 0x00, 0x00, 0x00,
             0x5D, static_cast<char>(0xF6), static_cast<char>(0xE0), static_cast<char>(0xE2)

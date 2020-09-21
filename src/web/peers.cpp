@@ -25,8 +25,7 @@ void printHex(const char* toPrint, int size, int width = 16) {
         if (i % width == 0) {
             std::cout << std::endl;
         }
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << (unsigned int) toPrint[i] << ' ';
-        //std::cout << (int)toPrint[i] << ' ';
+        std::cout << std::hex << std::setfill('0') << std::setw(2) << (int) toPrint[i] << ' ';
     }
     std::cout << std::endl << std::dec;
 }

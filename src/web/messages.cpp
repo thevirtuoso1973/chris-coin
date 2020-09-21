@@ -10,8 +10,8 @@
 // assumes there's enough space, sizeof(T) should be the number of bytes to write
 template<typename T>
 void MessageBuilder::writeLittleEndian(T bigEndian, char* toWriteInto) {
-    int numBytes = sizeof(T);
-    while (numBytes-- > 0) {
+    const int numBytes = sizeof(T);
+    for (int i = 0; i < numBytes; i++) {
         uint8_t newValue = bigEndian & 0xFF;
         *(toWriteInto++) = newValue;
 
