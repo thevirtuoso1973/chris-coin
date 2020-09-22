@@ -152,6 +152,9 @@ void MessageBuilder::writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
         *(toWrite++) = 0xFF;
         auto bytes = getIPv4Bytes(ipAddr);
         assert(bytes.size() == 4 && "Expecting 4 bytes for IPv4");
+        for (int i = 0; i < 4; i++) {
+            *(toWrite++) = bytes[i];
+        }
     }
 }
 
