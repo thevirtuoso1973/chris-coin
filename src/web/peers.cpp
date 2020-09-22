@@ -1,4 +1,5 @@
 #include "peers.hpp"
+#include "messages.hpp"
 
 #include <bits/stdint-intn.h>
 #include <bits/stdint-uintn.h>
@@ -15,7 +16,6 @@
 #include <iomanip>
 
 Peer::Peer(std::string ip, bool isIPv6, int port) {
-    this->messageBuilder = MessageBuilder();
     this->ip = ip;
     this->isIPv6 = isIPv6;
     this->port = port;
@@ -26,7 +26,7 @@ void printHex(const char* toPrint, int size, int width = 16) {
         if (i % width == 0) {
             std::cout << std::endl;
         }
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << (uint8_t) toPrint[i] << ' ';
+        std::cout << std::hex << std::setfill('0') << std::setw(2) << (int) toPrint[i] << ' ';
     }
     std::cout << std::endl << std::dec;
 }
@@ -34,20 +34,25 @@ void printHex(const char* toPrint, int size, int width = 16) {
 // creates TCP handle and sets listeners
 void Peer::init(std::shared_ptr<uvw::Loop> loop) {
     auto tcp = loop->resource<uvw::TCPHandle>();
+    auto c_ip = &ip[0];
+    auto c_isIPv6 = isIPv6;
+    auto c_port = port;
     if (tcp) {
         tcp->on<uvw::ErrorEvent>([](const uvw::ErrorEvent& event, uvw::TCPHandle& tcp) {
             event.what();
             tcp.close();
         });
-        tcp->once<uvw::ConnectEvent>([this](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) {
-            std::clog << "Connecting to " << this << std::endl;
+        tcp->once<uvw::ConnectEvent>([c_ip,
+                                      c_isIPv6,
+                                      c_port](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) { // FIXME: connecting too the same peer
             int64_t tStamp = std::time(nullptr);
+            std::clog << "Connecting to " << c_ip << " at time " << tStamp << std::endl;
             net_addr addr_recv = net_addr {
                 0,
                 SERVICES,
-                &(this->ip[0]),
-                static_cast<uint16_t>(this->port),
-                this->isIPv6
+                c_ip,
+                static_cast<uint16_t>(c_port),
+                c_isIPv6
             };
             char localIp[] = "127.0.0.1";
             net_addr addr_from = net_addr {
@@ -55,13 +60,13 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
                 SERVICES,
                 localIp,
                 18333,
-                this->isIPv6
+                c_isIPv6
             };
             std::string userAgent = ""; // NOTE: empty user agent string
-            const int dataLength = 4+12+4+4
-                +4+8+8+26+26+8+this->messageBuilder.getVarStrSize(userAgent)+4+1; // payload
+            const int dataLength = 4+12+4+4 // header
+                +4+8+8+26+26+8+MessageBuilder::getVarStrSize(userAgent)+4+1; // payload
                
-            auto dataWrite = this->messageBuilder.getVersionMessage(
+            auto dataWrite = MessageBuilder::getVersionMessage(
                 VERSION,
                 SERVICES,
                 tStamp,
@@ -72,14 +77,14 @@ void Peer::init(std::shared_ptr<uvw::Loop> loop) {
                 HEIGHT,
                 false
             );
-            printHex(dataWrite, dataLength);
-            // tcp.write(
-            //     std::move(dataWrite),
-            //     4+8+8+26+26+8+userAgent.size()+1+4+1 // number of bytes
-            // );
+            //printHex(dataWrite, dataLength);
+            tcp.write(
+                std::move(dataWrite),
+                dataLength
+            );
         });
         tcp->on<uvw::DataEvent>([this](const uvw::DataEvent& event, uvw::TCPHandle& tcp) {
-            std::clog << this << ' ' << event.data.get() << std::endl;
+            std::cout << this->ip << '\n' << event.data.get() << std::endl;
             // TODO
         });
 

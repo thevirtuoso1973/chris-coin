@@ -245,5 +245,3 @@ char* MessageBuilder::getVerackMessage() {
     const char *command = "verack\0\0\0\0\0";
     return createMessage(Magic::TESTNET3, command, 0, nullptr);
 }
-
-MessageBuilder::~MessageBuilder() {}

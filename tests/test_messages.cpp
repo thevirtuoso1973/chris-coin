@@ -2,26 +2,21 @@
 #include <bits/stdint-uintn.h>
 #include "../src/web/messages.hpp"
 
-class MessageBuilderTest: public ::testing::Test {
-    protected:
-        MessageBuilder messageBuilder;
-};
-
-TEST_F(MessageBuilderTest, writeLittleEndianWorks) {
+TEST(MessageBuilderTest, writeLittleEndianWorks) {
     const uint32_t num = 0xD9B4BEF9;
     char toWrite[] = {' ', ' ', ' ', ' '};
-    messageBuilder.writeLittleEndian(num, toWrite);
+    MessageBuilder::writeLittleEndian(num, toWrite);
     EXPECT_EQ(0xF9, (uint8_t) toWrite[0]);
     EXPECT_EQ(0xBE, (uint8_t) toWrite[1]);
     EXPECT_EQ(0xB4, (uint8_t) toWrite[2]);
     EXPECT_EQ(0xD9, (uint8_t) toWrite[3]);
 }
 
-TEST_F(MessageBuilderTest, writeIPAddrWorks) {
+TEST(MessageBuilderTest, writeIPAddrWorks) {
     char ip[] = "127.0.0.1";
     char toWrite[16];
 
-    messageBuilder.writeIPAddr(ip, false, toWrite);
+    MessageBuilder::writeIPAddr(ip, false, toWrite);
     for (int i = 0; i < 10; i++) {
         EXPECT_EQ(0x00, (uint8_t) toWrite[i]);
     }
@@ -33,21 +28,21 @@ TEST_F(MessageBuilderTest, writeIPAddrWorks) {
     EXPECT_EQ(1, (uint8_t) toWrite[15]);
 }
 
-TEST_F(MessageBuilderTest, getVarStrSizeWorks) {
+TEST(MessageBuilderTest, getVarStrSizeWorks) {
     const std::string empty = "";
     const std::string shortStr = "/Custom:0.10/";
 
-    EXPECT_EQ(1, messageBuilder.getVarStrSize(empty));
-    EXPECT_EQ(1+shortStr.size(), messageBuilder.getVarStrSize(shortStr));
+    EXPECT_EQ(1, MessageBuilder::getVarStrSize(empty));
+    EXPECT_EQ(1+shortStr.size(), MessageBuilder::getVarStrSize(shortStr));
 }
 
-TEST_F(MessageBuilderTest, getVerackMessageWorks) {
+TEST(MessageBuilderTest, getVerackMessageWorks) {
     char expected[] {
         static_cast<char>(0x0B), static_cast<char>(0x11), static_cast<char>(0x09), static_cast<char>(0x07),
             'v', 'e', 'r', 'a', 'c', 'k', '\0', '\0', '\0', '\0', '\0',
             0x00, 0x00, 0x00, 0x00,
             0x5D, static_cast<char>(0xF6), static_cast<char>(0xE0), static_cast<char>(0xE2)
             };
-    ASSERT_STREQ(expected, messageBuilder.getVerackMessage());
+    ASSERT_STREQ(expected, MessageBuilder::getVerackMessage());
 }
 

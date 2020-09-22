@@ -15,8 +15,6 @@ class Peer {
         bool isIPv6;
         int port;
 
-        MessageBuilder messageBuilder;
-
     public:
         Peer(std::string ip, bool isIPv6, int port);
 

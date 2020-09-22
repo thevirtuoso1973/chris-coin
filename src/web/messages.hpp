@@ -21,29 +21,30 @@ struct net_addr {
 };
 
 class MessageBuilder {
+    private:
+        MessageBuilder();
+
     public:
         template<typename T>
-        void writeLittleEndian(T bigEndian, char* toWriteInto);
+        static void writeLittleEndian(T bigEndian, char* toWriteInto);
 
         template<typename T>
-        void writeBigEndian(T bigEndian, char* toWriteInto);
+        static void writeBigEndian(T bigEndian, char* toWriteInto);
 
-        void writeMagic(Magic magic, char* toWriteInto);
-        void writeVarString(std::string s, char *toWrite);
-        void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite);
+        static void writeMagic(Magic magic, char* toWriteInto);
+        static void writeVarString(std::string s, char *toWrite);
+        static void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) ;
 
         // Helper function that wraps the header around the payload. Will generate the checksum.
-        char* createMessage(
+        static char* createMessage(
             Magic magic,
             const char* command,
             uint32_t payload_length,
             char* payload
         );
 
-        MessageBuilder();
-
         // Gets the entire message (not just the payload)
-        char* getVersionMessage(
+        static char* getVersionMessage(
             int32_t version,
             uint64_t services,
             int64_t timestamp,
@@ -55,12 +56,9 @@ class MessageBuilder {
             int32_t start_height,
             // requires version >= 70001:
             bool relay
-        );
-        char* getVerackMessage();
+        ) ;
+        static char* getVerackMessage();
 
         // gets number of bytes including the var_int
-        int getVarStrSize(std::string s);
-
-        ~MessageBuilder();
+        static int getVarStrSize(std::string s);
 };
-
