@@ -1,3 +1,5 @@
+#pragma once
+
 #include <bits/stdint-intn.h>
 #include <bits/stdint-uintn.h>
 #include <string>
@@ -19,9 +21,10 @@ struct net_addr {
 };
 
 class MessageBuilder {
-    private:
+    public:
         template<typename T>
         void writeLittleEndian(T bigEndian, char* toWriteInto);
+
         template<typename T>
         void writeBigEndian(T bigEndian, char* toWriteInto);
 
@@ -37,7 +40,6 @@ class MessageBuilder {
             char* payload
         );
 
-    public:
         MessageBuilder();
 
         // Gets the entire message (not just the payload)

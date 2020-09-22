@@ -1,10 +1,37 @@
 #include "gtest/gtest.h"
+#include <bits/stdint-uintn.h>
 #include "../src/web/messages.hpp"
 
 class MessageBuilderTest: public ::testing::Test {
     protected:
         MessageBuilder messageBuilder;
 };
+
+TEST_F(MessageBuilderTest, writeLittleEndianWorks) {
+    const uint32_t num = 0xD9B4BEF9;
+    char toWrite[] = {' ', ' ', ' ', ' '};
+    messageBuilder.writeLittleEndian(num, toWrite);
+    EXPECT_EQ(0xF9, (uint8_t) toWrite[0]);
+    EXPECT_EQ(0xBE, (uint8_t) toWrite[1]);
+    EXPECT_EQ(0xB4, (uint8_t) toWrite[2]);
+    EXPECT_EQ(0xD9, (uint8_t) toWrite[3]);
+}
+
+TEST_F(MessageBuilderTest, writeIPAddrWorks) {
+    char ip[] = "127.0.0.1";
+    char toWrite[16];
+
+    messageBuilder.writeIPAddr(ip, false, toWrite);
+    for (int i = 0; i < 10; i++) {
+        EXPECT_EQ(0x00, (uint8_t) toWrite[i]);
+    }
+    EXPECT_EQ(0xFF, (uint8_t) toWrite[10]);
+    EXPECT_EQ(0xFF, (uint8_t) toWrite[11]);
+    EXPECT_EQ(127, (uint8_t) toWrite[12]);
+    EXPECT_EQ(0, (uint8_t) toWrite[13]);
+    EXPECT_EQ(0, (uint8_t) toWrite[14]);
+    EXPECT_EQ(1, (uint8_t) toWrite[15]);
+}
 
 TEST_F(MessageBuilderTest, getVarStrSizeWorks) {
     const std::string empty = "";
@@ -24,4 +51,3 @@ TEST_F(MessageBuilderTest, getVerackMessageWorks) {
     ASSERT_STREQ(expected, messageBuilder.getVerackMessage());
 }
 
-// TODO more tests
