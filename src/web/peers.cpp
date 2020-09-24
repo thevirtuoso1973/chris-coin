@@ -33,7 +33,7 @@ void printHex(const char* toPrint, int size, int width = 16) {
 
 // sets listeners
 void Peer::init(std::shared_ptr<uvw::TCPHandle> tcp) {
-    auto c_ip = &ip[0];
+    auto c_ip = ip;
     auto c_isIPv6 = isIPv6;
     auto c_port = port;
     tcp->on<uvw::ErrorEvent>([](const uvw::ErrorEvent& event, uvw::TCPHandle& tcp) {
@@ -42,13 +42,13 @@ void Peer::init(std::shared_ptr<uvw::TCPHandle> tcp) {
     });
     tcp->once<uvw::ConnectEvent>([c_ip,
                                   c_isIPv6,
-                                  c_port](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) { // FIXME: connecting too the same peer
+                                  c_port](const uvw::ConnectEvent& event, uvw::TCPHandle& tcp) {
         int64_t tStamp = std::time(nullptr);
         std::clog << "Connecting to " << c_ip << " at time " << tStamp << std::endl;
         net_addr addr_recv = net_addr {
         0,
         SERVICES,
-        c_ip,
+        c_ip.c_str(),
         static_cast<uint16_t>(c_port),
         c_isIPv6
     };

@@ -136,7 +136,7 @@ std::vector<uint8_t> getIPv4Bytes(const std::string ipAddr) {
     return out;
 }
 
-void MessageBuilder::writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
+void MessageBuilder::writeIPAddr(const char* ipAddr, bool isIPv6, char* toWrite) {
     if (isIPv6) {
         auto bytes = getIPv6Bytes(ipAddr);
         assert(bytes.size() == 16 && "Expecting 16 bytes for IPv6");
@@ -159,7 +159,7 @@ void MessageBuilder::writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) {
 }
 
 // writes var_int and then the char array.
-void MessageBuilder::writeVarString(std::string s, char *toWrite) {
+void MessageBuilder::writeVarString(const std::string s, char *toWrite) {
     int sLength = s.size();
     if (sLength < 0xFD) {
         uint8_t len = sLength;
@@ -206,7 +206,7 @@ char* MessageBuilder::getVersionMessage(
     int64_t timestamp,
     net_addr addr_recv,
     net_addr addr_from,
-    uint64_t nonce,
+    const uint64_t nonce,
     std::string user_agent_string,
     int32_t start_height,
     bool relay

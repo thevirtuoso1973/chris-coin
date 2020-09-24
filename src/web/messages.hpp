@@ -13,11 +13,11 @@ const static bool RELAY = false;
 enum Magic { MAIN, TESTNET, TESTNET3, NAMECOIN };
 
 struct net_addr {
-    uint32_t time;
-    uint64_t services;
-    char* ipAddr;
-    uint16_t port;
-    bool isIPv6;
+    const uint32_t time;
+    const uint64_t services;
+    const char* ipAddr;
+    const uint16_t port;
+    const bool isIPv6;
 };
 
 class MessageBuilder {
@@ -32,8 +32,8 @@ class MessageBuilder {
         static void writeBigEndian(T bigEndian, char* toWriteInto);
 
         static void writeMagic(Magic magic, char* toWriteInto);
-        static void writeVarString(std::string s, char *toWrite);
-        static void writeIPAddr(char* ipAddr, bool isIPv6, char* toWrite) ;
+        static void writeVarString(const std::string s, char *toWrite);
+        static void writeIPAddr(const char* ipAddr, bool isIPv6, char* toWrite) ;
 
         // Helper function that wraps the header around the payload. Will generate the checksum.
         static char* createMessage(
@@ -51,7 +51,7 @@ class MessageBuilder {
             net_addr addr_recv,
             // Fields below require version >= 106:
             net_addr addr_from,
-            uint64_t nonce,
+            const uint64_t nonce,
             std::string user_agent_string,
             int32_t start_height,
             // requires version >= 70001:
