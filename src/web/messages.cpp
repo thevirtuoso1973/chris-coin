@@ -229,12 +229,7 @@ char* MessageBuilder::getVersionMessage(
     writeBigEndian(addr_from.port, payload+70);
 
     writeLittleEndian(nonce, payload+72);
-    if (user_agent_string.length() > 0) {
-        writeVarString(user_agent_string, payload + 80);
-    } else {
-        char* temp = payload+80;
-        *temp = 0x00;
-    }
+    writeVarString(user_agent_string, payload + 80);
     writeLittleEndian(start_height, payload+80+varStrLen);
     uint8_t relayBool = (relay) ? 0x01 : 0x00; // NOTE: not sure if 0x01 is true
     writeBigEndian(relayBool, payload+80+varStrLen+4);
