@@ -46,3 +46,6 @@ TEST(MessageBuilderTest, getVerackMessageWorks) {
     ASSERT_STREQ(expected, MessageBuilder::getVerackMessage());
 }
 
+TEST(MessageBuilderTest, createVersionPayloadWorks) {
+    // TODO: test createVersionPayload
+}

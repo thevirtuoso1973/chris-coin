@@ -76,7 +76,7 @@ char* MessageBuilder::createMessage(
     Magic magic,
     const char* command,
     uint32_t payload_length,
-    char* payload
+    const char* payload
 ) {
     char* data = new char[4+12+4+4+payload_length];
     writeMagic(magic, data); // pointer 0
@@ -91,6 +91,7 @@ char* MessageBuilder::createMessage(
     for (int write = 24, i = 0; write < 24 + payload_length; write++, i++) { // 24
         data[write] = payload[i];
     }
+    delete payload;
     return data;
 }
 
@@ -200,7 +201,7 @@ int MessageBuilder::getVarStrSize(std::string s) {
     return intLen+s.size();
 }
 
-char* MessageBuilder::getVersionMessage(
+char* MessageBuilder::createVersionPayload(
     int32_t version,
     uint64_t services,
     int64_t timestamp,
@@ -211,7 +212,6 @@ char* MessageBuilder::getVersionMessage(
     int32_t start_height,
     bool relay
 ) {
-    const char *command = "version\0\0\0\0";
     int varStrLen = getVarStrSize(user_agent_string);
     uint32_t payload_length = 4+8+8+26+26+8+varStrLen+4+1;
     char *payload = new char[payload_length];
@@ -233,7 +233,35 @@ char* MessageBuilder::getVersionMessage(
     writeLittleEndian(start_height, payload+80+varStrLen);
     uint8_t relayBool = (relay) ? 0x01 : 0x00; // NOTE: not sure if 0x01 is true
     writeBigEndian(relayBool, payload+80+varStrLen+4);
-    return createMessage(Magic::TESTNET3, command, payload_length, payload);
+    return payload;
+}
+
+char* MessageBuilder::getVersionMessage(
+    int32_t version,
+    uint64_t services,
+    int64_t timestamp,
+    net_addr addr_recv,
+    net_addr addr_from,
+    const uint64_t nonce,
+    std::string user_agent_string,
+    int32_t start_height,
+    bool relay
+) {
+    const char *command = "version\0\0\0\0";
+    const char* payload = createVersionPayload(
+        version,
+        services,
+        timestamp,
+        addr_recv,
+        addr_from,
+        nonce,
+        user_agent_string,
+        start_height,
+        relay
+    );
+    int varStrLen = getVarStrSize(user_agent_string);
+    uint32_t payload_length = 4+8+8+26+26+8+varStrLen+4+1;
+    return createMessage(Magic::TESTNET3, command, payload_length, std::move(payload));
 }
 
 char* MessageBuilder::getVerackMessage() {

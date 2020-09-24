@@ -40,7 +40,20 @@ class MessageBuilder {
             Magic magic,
             const char* command,
             uint32_t payload_length,
-            char* payload
+            const char* payload
+        );
+        static char* createVersionPayload(
+            int32_t version,
+            uint64_t services,
+            int64_t timestamp,
+            net_addr addr_recv,
+            // Fields below require version >= 106:
+            net_addr addr_from,
+            const uint64_t nonce,
+            std::string user_agent_string,
+            int32_t start_height,
+            // requires version >= 70001:
+            bool relay
         );
 
         // Gets the entire message (not just the payload)
@@ -56,7 +69,7 @@ class MessageBuilder {
             int32_t start_height,
             // requires version >= 70001:
             bool relay
-        ) ;
+        );
         static char* getVerackMessage();
 
         // gets number of bytes including the var_int

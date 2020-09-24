@@ -81,8 +81,8 @@ void Peer::init(std::shared_ptr<uvw::TCPHandle> tcp) {
             dataLength
         );
     });
-    tcp->on<uvw::DataEvent>([this](const uvw::DataEvent& event, uvw::TCPHandle& tcp) {
-        std::cout << this->ip << '\n' << event.data.get() << std::endl;
+    tcp->on<uvw::DataEvent>([c_ip](const uvw::DataEvent& event, uvw::TCPHandle& tcp) {
+        std::clog << c_ip << '\n' << event.data.get() << std::endl;
         // TODO
     });
 
