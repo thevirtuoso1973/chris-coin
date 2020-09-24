@@ -19,7 +19,14 @@ void FullNode::run(int portNum) {
     }
 
     for (auto peer : peers) {
-        peer.init(loop);
+        std::shared_ptr<uvw::TCPHandle> tcp;
+        int failcount = 0;
+        while (!(tcp = loop->resource<uvw::TCPHandle>()) && failcount++ < 5);
+        if (tcp) {
+            peer.init(tcp);
+        } else {
+            std::cerr << "Failed to create tcp handle" << std::endl;
+        }
     }
     loop->run();
 }
