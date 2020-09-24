@@ -46,20 +46,20 @@ void Peer::init(std::shared_ptr<uvw::TCPHandle> tcp) {
         int64_t tStamp = std::time(nullptr);
         std::clog << "Connecting to " << c_ip << " at time " << tStamp << std::endl;
         net_addr addr_recv = net_addr {
-        0,
-        SERVICES,
-        c_ip.c_str(),
-        static_cast<uint16_t>(c_port),
-        c_isIPv6
-    };
+            0,
+            SERVICES,
+            c_ip.c_str(),
+            static_cast<uint16_t>(c_port),
+            c_isIPv6
+        };
         char localIp[] = "127.0.0.1";
         net_addr addr_from = net_addr {
-        0,
-        SERVICES,
-        localIp,
-        18333,
-        c_isIPv6
-    };
+            0,
+            SERVICES,
+            localIp,
+            18333,
+            c_isIPv6
+        };
         std::string userAgent = ""; // NOTE: empty user agent string
         const int dataLength = 4+12+4+4 // header
             +4+8+8+26+26+8+MessageBuilder::getVarStrSize(userAgent)+4+1; // payload
