@@ -231,7 +231,7 @@ char* MessageBuilder::createVersionPayload(
     writeLittleEndian(nonce, payload+72);
     writeVarString(user_agent_string, payload + 80);
     writeLittleEndian(start_height, payload+80+varStrLen);
-    uint8_t relayBool = (relay) ? 0x01 : 0x00; // NOTE: not sure if 0x01 is true
+    uint8_t relayBool = (relay) ? 0x01 : 0x00;
     writeBigEndian(relayBool, payload+80+varStrLen+4);
     return payload;
 }
