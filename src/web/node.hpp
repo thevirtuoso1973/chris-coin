@@ -19,6 +19,7 @@ class FullNode {
     std::shared_ptr<uvw::Loop> loop;
 
     std::vector<Peer> peers; // not necessarily open/closed
+    void listen(std::shared_ptr<uvw::TCPHandle> tcp, int port);
 
   public:
     FullNode();

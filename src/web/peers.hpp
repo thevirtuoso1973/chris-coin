@@ -1,5 +1,7 @@
 #pragma once
 
+#include "messages.hpp"
+
 #include <uvw.hpp>
 
 #include <memory>
@@ -10,12 +12,13 @@
 class Peer {
     private:
         std::string ip;
+        bool isIPv6;
         int port;
 
     public:
-        Peer(std::string ip, int port);
+        Peer(std::string ip, bool isIPv6, int port);
 
-        void init(std::shared_ptr<uvw::Loop> loop);
+        void init(std::shared_ptr<uvw::TCPHandle> tcp);
 
         ~Peer();
         friend std::ostream& operator<<(std::ostream& os, const Peer& peer);

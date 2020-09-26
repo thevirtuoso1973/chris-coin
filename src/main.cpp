@@ -5,7 +5,7 @@
 int main() {
     FullNode fullNode;
 
-    fullNode.run(8333);
+    fullNode.run(18333); // default for testnet
 
     std::cout << "Input anything to end." << std::endl;
     std::string ignored;
